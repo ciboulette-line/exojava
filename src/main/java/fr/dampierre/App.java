@@ -11,7 +11,7 @@ public class App {
         testBdd();
     }
 
-    private static void testBdd() {
+    public static void testBdd() {
 
         // Connexion à la base de données en précisant son URL ainsi ainsi que les
         // identifiants de l'utilisateur SQL
@@ -48,6 +48,37 @@ public class App {
             Statement statement = con.createStatement();
 
             ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                clients.add(construireClientDepuis(resultSet));
+            }
+            resultSet.close();
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return clients;
+
+    }
+
+    public List<Client> retournerUtilisateursProtege(String condition) {
+
+        String dbURL = "jdbc:mysql://localhost:3306/exo_random_java?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+        String username = "root";
+        String password = "6GPTqaJXn3g7Y3jg459y";
+        List<Client> clients = new ArrayList();
+
+        String sql = String.format("select nom_user , id_user , password_user from users where nom_user LIKE ? ",
+                condition);
+
+        try {
+            Connection con = DriverManager.getConnection(dbURL, username, password);
+            PreparedStatement statement = con.prepareStatement(sql);
+            statement.setString(1, condition);
+            statement.execute();
+
+            ResultSet resultSet = statement.getResultSet();
 
             while (resultSet.next()) {
                 clients.add(construireClientDepuis(resultSet));
